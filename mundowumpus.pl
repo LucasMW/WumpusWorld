@@ -68,8 +68,8 @@ iniciar_agente :-
 
 
 iniciar_mundoteste :-
-	retractall(tamanho_mundo(_)),
-	assert(tamanho_mundo(6)),
+	%retractall(tamanho_mundo(_)),
+	%assert(tamanho_mundo(6)),
 
 	retractall(wumpus_vivo(_)),
 	assert(wumpus_vivo(sim)),
@@ -145,7 +145,7 @@ tem_cheiro([X,Y],nao) :- adjacente([X,Y],[R,T]), not(wumpus([R,T])).
 tem_brisa([X,Y],sim) :- adjacente([X,Y], [R,T]), abismo([R,T]).
 tem_brisa([X,Y],nao) :- adjacente([X,Y], [R,T]), not(abismo([R,T])).
 tem_brilho([X,Y],sim) :- adjacente([X,Y], [R,T]), ouro([R,T]).
-tem_brilho([X,Y],sim) :- adjacente([X,Y], [R,T]), not(ouro([R,T])).
+tem_brilho([X,Y],nao) :- adjacente([X,Y], [R,T]), not(ouro([R,T])).
 tem_grito([X,Y],sim) :- adjacente([X,Y], [R,T]), morcego([R,T]).
 tem_grito([X,Y],nao) :- adjacente([X,Y], [R,T]), not(morcego([R,T])).
 tem_parede([X,Y],sim) :- adjacente([X,Y], [R,T]), parede([R,T]).
@@ -279,6 +279,14 @@ subir:-
 	assert(dentro_da_caverna(nao)).
 
 %propriedades do ambiente
+
+
+%melhor ação
+
+  Prioridade is [tem_brilho,tem_grito,tem_cheiro,tem_brisa,tem_parede].
+  finished() :- contagem_ouro(X) is 3
+ 
+  melhor_acao(pegar_objeto(V))  :- agente_local([X,Y]), tem_brilho([X,Y],sim).
 
 
 
