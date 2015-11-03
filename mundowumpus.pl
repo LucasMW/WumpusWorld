@@ -285,7 +285,7 @@ subir:-
 
   Prioridade is [tem_brilho,tem_grito,tem_cheiro,tem_brisa,tem_parede].
   finished() :- contagem_ouro(X) is 3
- 
+  %melhor_acao([X,Y]) is pegar_objeto :- agente_local([X,Y]), tem_brilho([X,Y],sim).
   melhor_acao(pegar_objeto(V))  :- agente_local([X,Y]), tem_brilho([X,Y],sim).
 
 
