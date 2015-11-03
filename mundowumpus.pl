@@ -3,6 +3,10 @@
 :-dynamic([
       agente_local/1,
       agente_orientacao/1,
+      wumpus/1,
+      abismo/1,
+      ouro/1,
+      morcego/1,
       tem_ouro/1,
       tem_abismo/1,
       wumpus_vivo/1,
@@ -10,18 +14,13 @@
       locais_visitados/1,
       pontuacao/1,
       dentro_da_caverna/1,
-      flechas/1
+      flechas/1,
+      contagem_ouro/1
   ]).
 
 %fatos
 
-wumpus_local([X,Y]).
-
-abismo([X,Y]).
-
-ouro([X,Y]).
-
-morcego([X,Y]).
+tamanho_mundo(T).
 
 parede([]).
 
@@ -32,6 +31,10 @@ matar_wumpus:-
 	retract(wumpus_vivo(sim)),
 	assert(wumpus_vivo(nao)).
 
+matar_agente:-
+	retract(agente_vivo(sim)),
+	assert(agente_vivo(nao)),
+	diminuir_pontuacao(1000).
 
 
 
@@ -43,9 +46,6 @@ iniciar_agente :-
 
 	retractall( pontuacao(_) ),
 	assert(pontuacao(0)),
-
-	retractall(locais_visitados(_)),
-	assert(locais_visitados([])),
 
 	retractall(flechas(_)),
 	assert(flechas(5)),
@@ -60,7 +60,10 @@ iniciar_agente :-
 	assert(locais_visitados( [1,1] )),
 
 	retractall(agente_vivo(_)),
-	assert(agente_vivo(sim)).
+	assert(agente_vivo(sim)),
+
+	retractall(contagem_ouro(_)),
+	assert(contagem_ouro(0)).
 
 
 
@@ -75,7 +78,32 @@ iniciar_mundoteste :-
 	assert(tem_abismo(nao)),
 
 	retractall(tem_ouro(_)),
-	assert(tem_ouro(nao)).
+	assert(tem_ouro(nao)),
+
+	retractall(ouro(_)),
+	assert(ouro([3,2])),
+	assert(ouro([6,5])),
+	assert(ouro([1,6])),
+
+	retractall(abismo(_)),
+	assert(abismo([1,5])),
+	assert(abismo([5,2])),
+	assert(abismo([4,2])),
+	assert(abismo([5,5])),
+
+	retractall(wumpus(_)),
+	assert(wumpus([3,5])),
+	assert(wumpus([4,1])),
+
+	retractall(morcego(_)),
+	assert(morcego([1,3])),
+	assert(morcego([3,3])).
+
+
+
+
+
+
 
 
 
@@ -112,8 +140,8 @@ adjacente( [X1,Y1], [X2,Y2] ):-
 	; Y1 = Y2 , X1 = X2-1
 	).
 
-tem_cheiro([X,Y],sim) :- adjacente([X,Y],[R,T]), wumpus_local([R,T]).
-tem_cheiro([X,Y],nao) :- adjacente([X,Y],[R,T]), not(wumpus_local([R,T])).
+tem_cheiro([X,Y],sim) :- adjacente([X,Y],[R,T]), wumpus([R,T]).
+tem_cheiro([X,Y],nao) :- adjacente([X,Y],[R,T]), not(wumpus([R,T])).
 tem_brisa([X,Y],sim) :- adjacente([X,Y], [R,T]), abismo([R,T]).
 tem_brisa([X,Y],nao) :- adjacente([X,Y], [R,T]), not(abismo([R,T])).
 tem_brilho([X,Y],sim) :- adjacente([X,Y], [R,T]), ouro([R,T]).
@@ -126,26 +154,60 @@ tem_parede([X,Y],nao) :- adjacente([X,Y], [R,T]), not(parede([R,T])).
 
 %ações do agente
 
-mover_para_frente:-
+mover_para_frente(leste):-
+	agente_vivo(sim),
+	agente_orientacao(leste),
 	agente_local([X,Y]),
 	X1 is X+1, not(fora_do_mundo([X1,Y])),
 	assert(agente_local([X1,Y])),
 	retract(agente_local([X,Y])),
 	diminuir_pontuacao(1).
 
+mover_para_frente(oeste):-
+	agente_vivo(sim),
+	agente_orientacao(oeste),
+	agente_local([X,Y]),
+	X1 is X-1, not(fora_do_mundo([X1,Y])),
+	assert(agente_local([X1,Y])),
+	retract(agente_local([X,Y])),
+	diminuir_pontuacao(1).
+
+mover_para_frente(norte):-
+	agente_vivo(sim),
+	agente_orientacao(norte),
+	agente_local([X,Y]),
+	Y1 is Y+1, not(fora_do_mundo([X,Y1])),
+	assert(agente_local([X,Y1])),
+	retract(agente_local([X,Y])),
+	diminuir_pontuacao(1).
+
+mover_para_frente(sul):-
+	agente_vivo(sim),
+	agente_orientacao(sul),
+	agente_local([X,Y]),
+	Y1 is Y-1, not(fora_do_mundo([X,Y1])),
+	assert(agente_local([X,Y1])),
+	retract(agente_local([X,Y])),
+	diminuir_pontuacao(1).
+
+
+
 virar_a_direita(sul):-
+	agente_vivo(sim),
 	agente_orientacao(leste),
 	retract(agente_orientacao(leste)),
 	assert(agente_orientacao(sul)),
 	diminuir_pontuacao(1).
 
 virar_a_direita(oeste):-
+	agente_vivo(sim),
 	agente_orientacao(sul),
 	retract(agente_orientacao(sul)),
 	assert(agente_orientacao(oeste)),
 	diminuir_pontuacao(1).
 
 virar_a_direta(norte):-
+	agente_vivo(sim),
 	agente_orientacao(oeste),
 	retract(agente_orientacao(oeste)),
 	assert(agente_orientacao(norte)),
@@ -153,6 +215,7 @@ virar_a_direta(norte):-
 
 
 virar_a_direita(leste):-
+	agente_vivo(sim),
 	agente_orientacao(norte),
 	retract(agente_orientacao(norte)),
 	assert(agente_orientacao(leste)),
@@ -160,11 +223,18 @@ virar_a_direita(leste):-
 
 
 pegar_objeto:-
+	agente_vivo(sim),
 	agente_local([X,Y]),
 	ouro([X,Y]),
+	contagem_ouro(Ouro),
 	aumentar_pontuacao(1000),
 	retract(ouro([X,Y])),
+	Ouro1 is Ouro+1,
+	retract(contagem_ouro(Ouro)),
+	assert(contagem_ouro(Ouro1)),
+
 	diminuir_pontuacao(1).
+
 
 
 flecha_movimento([X,Y],leste):-
@@ -185,11 +255,12 @@ flecha_movimento([X,Y],sul):-
 
 flecha_alvo([X,Y],Direcao):-
 	flecha_movimento([X,Y],Direcao),
-	wumpus_local([X,Y]),
+	wumpus([X,Y]),
 	matar_wumpus.
 
 
 atirar_flecha:-
+	agente_vivo(sim),
 	flechas(X),
 	X > 0,
 	X1 = X-1,
@@ -202,6 +273,12 @@ atirar_flecha:-
 
 
 subir:-
+	agente_vivo(sim),
 	agente_local([1,1]),
 	diminuir_pontuacao(1),
 	assert(dentro_da_caverna(nao)).
+
+%propriedades do ambiente
+
+
+
