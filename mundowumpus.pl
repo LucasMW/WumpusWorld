@@ -39,9 +39,24 @@ matar_agente:-
 	%percepcao = [brisa,brilho,cheiro,grito,parede].
 	%estado(agenteLocal,direcao,qtdFlechas,pontuacao,qtdOuro).
 move(
-estado(AgenteLocal,Direcao,QtdOuro,QtdFlechas,Pontuacao),
-mover_para_frente(Direcao),
-estado(AgenteLocal,Direcao,QtdOuro,QtdFlechas,Pontuacao)
+estado(agenteLocal([X,Y]),norte,QtdOuro,QtdFlechas,Pontuacao),
+mover_para_frente(norte),
+estado(agenteLocal([X,Y+1]),Direcao,QtdOuro,QtdFlechas,Pontuacao)
+).
+move(
+estado(agenteLocal([X,Y]),leste,QtdOuro,QtdFlechas,Pontuacao),
+mover_para_frente(leste),
+estado(agenteLocal([X+1,Y]),Direcao,QtdOuro,QtdFlechas,Pontuacao)
+).
+move(
+estado(agenteLocal([X,Y]),sul,QtdOuro,QtdFlechas,Pontuacao),
+mover_para_frente(sul),
+estado(agenteLocal([X,Y-1]),Direcao,QtdOuro,QtdFlechas,Pontuacao)
+).
+move(
+estado(agenteLocal([X,Y]),oeste,QtdOuro,QtdFlechas,Pontuacao),
+mover_para_frente(oeste),
+estado(agenteLocal([X-1,Y]),Direcao,QtdOuro,QtdFlechas,Pontuacao)
 ).
 move(
 estado(AgenteLocal,norte,QtdOuro,QtdFlechas,Pontuacao),
@@ -175,8 +190,8 @@ mover_para_frente(leste):-
 	agente_local([X,Y]),
 	X1 is X+1, not(fora_do_mundo([X1,Y])),
 	assert(agente_local([X1,Y])),
-	retract(agente_local([X,Y])),
-	diminuir_pontuacao(1).
+	retract(agente_local([X,Y])).
+
 
 mover_para_frente(oeste):-
 	agente_vivo(sim),
@@ -184,8 +199,8 @@ mover_para_frente(oeste):-
 	agente_local([X,Y]),
 	X1 is X-1, not(fora_do_mundo([X1,Y])),
 	assert(agente_local([X1,Y])),
-	retract(agente_local([X,Y])),
-	diminuir_pontuacao(1).
+	retract(agente_local([X,Y])).
+
 
 mover_para_frente(norte):-
 	agente_vivo(sim),
@@ -193,8 +208,8 @@ mover_para_frente(norte):-
 	agente_local([X,Y]),
 	Y1 is Y+1, not(fora_do_mundo([X,Y1])),
 	assert(agente_local([X,Y1])),
-	retract(agente_local([X,Y])),
-	diminuir_pontuacao(1).
+	retract(agente_local([X,Y])).
+
 
 mover_para_frente(sul):-
 	agente_vivo(sim),
@@ -202,8 +217,7 @@ mover_para_frente(sul):-
 	agente_local([X,Y]),
 	Y1 is Y-1, not(fora_do_mundo([X,Y1])),
 	assert(agente_local([X,Y1])),
-	retract(agente_local([X,Y])),
-	diminuir_pontuacao(1).
+	retract(agente_local([X,Y])).
 
 
 
