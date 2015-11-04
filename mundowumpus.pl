@@ -36,7 +36,15 @@ matar_agente:-
 	assert(agente_vivo(nao)),
 	diminuir_pontuacao(1000).
 
-
+	%percepcao = [brisa,brilho,cheiro,grito,parede].
+	%estado(agenteLocal,direcao,qtdFlechas,[],pontuacao,qtdOuro).
+move(
+estado(agenteLocal,direcao,qtdOuro,qtdFlechas,[],pontuacao),
+pegar_banana,
+estado(no_centro, acima_caixa, no_centro,tem)
+).
+consegue(estado(_,_,_,_,_,qtdOuro),[]).
+consegue(Estado1,[Movimento|Resto]) :- move(Estado1, Movimento, Estado2), consegue(Estado2,Resto).
 
 %inicializar
 
@@ -64,7 +72,6 @@ iniciar_agente :-
 
 	retractall(contagem_ouro(_)),
 	assert(contagem_ouro(0)).
-
 
 
 iniciar_mundoteste :-
@@ -98,18 +105,6 @@ iniciar_mundoteste :-
 	retractall(morcego(_)),
 	assert(morcego([1,3])),
 	assert(morcego([3,3])).
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 %atualizar a pontuaçao
@@ -282,11 +277,5 @@ subir:-
 
 
 %melhor ação
-
-  Prioridade is [tem_brilho,tem_grito,tem_cheiro,tem_brisa,tem_parede].
-  finished() :- contagem_ouro(X) is 3
-  %melhor_acao([X,Y]) is pegar_objeto :- agente_local([X,Y]), tem_brilho([X,Y],sim).
-  melhor_acao(pegar_objeto(V))  :- agente_local([X,Y]), tem_brilho([X,Y],sim).
-
 
 
