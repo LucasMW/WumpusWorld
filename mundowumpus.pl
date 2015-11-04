@@ -37,9 +37,14 @@ matar_agente:-
 	diminuir_pontuacao(1000).
 
 	%percepcao = [brisa,brilho,cheiro,grito,parede].
-	%estado(agenteLocal,direcao,qtdFlechas,[],pontuacao,qtdOuro).
+	%estado(agenteLocal,direcao,qtdFlechas,pontuacao,qtdOuro).
 move(
-estado(agenteLocal,direcao,qtdOuro,qtdFlechas,[],pontuacao),
+estado(agenteLocal,direcao,qtdOuro,qtdFlechas,pontuacao),
+mover_para_frente(direcao),
+estado(agenteLocal,direcao,qtdOuro,qtdFlechas,pontuacao)
+).
+move(
+estado(agenteLocal,direcao,qtdOuro,qtdFlechas,pontuacao),
 pegar_banana,
 estado(no_centro, acima_caixa, no_centro,tem)
 ).
