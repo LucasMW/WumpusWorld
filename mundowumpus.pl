@@ -39,14 +39,29 @@ matar_agente:-
 	%percepcao = [brisa,brilho,cheiro,grito,parede].
 	%estado(agenteLocal,direcao,qtdFlechas,pontuacao,qtdOuro).
 move(
-estado(agenteLocal,direcao,qtdOuro,qtdFlechas,pontuacao),
-mover_para_frente(direcao),
-estado(agenteLocal,direcao,qtdOuro,qtdFlechas,pontuacao)
+estado(AgenteLocal,Direcao,QtdOuro,QtdFlechas,Pontuacao),
+mover_para_frente(Direcao),
+estado(AgenteLocal,Direcao,QtdOuro,QtdFlechas,Pontuacao)
 ).
 move(
-estado(agenteLocal,direcao,qtdOuro,qtdFlechas,pontuacao),
-pegar_banana,
-estado(no_centro, acima_caixa, no_centro,tem)
+estado(AgenteLocal,norte,QtdOuro,QtdFlechas,Pontuacao),
+virar_a_direita(leste),
+estado(AgenteLocal,leste,QtdOuro,QtdFlechas,Pontuacao)
+).
+move(
+estado(AgenteLocal,leste,QtdOuro,QtdFlechas,Pontuacao),
+virar_a_direita(sul),
+estado(AgenteLocal,sul,QtdOuro,QtdFlechas,Pontuacao)
+).
+move(
+estado(AgenteLocal,sul,QtdOuro,QtdFlechas,Pontuacao),
+virar_a_direita(oeste),
+estado(AgenteLocal,oeste,QtdOuro,QtdFlechas,Pontuacao)
+).
+move(
+estado(AgenteLocal,oeste,QtdOuro,QtdFlechas,Pontuacao),
+virar_a_direita(norte),
+estado(AgenteLocal,norte,QtdOuro,QtdFlechas,Pontuacao)
 ).
 consegue(estado(_,_,_,_,_,qtdOuro),[]).
 consegue(Estado1,[Movimento|Resto]) :- move(Estado1, Movimento, Estado2), consegue(Estado2,Resto).
@@ -196,30 +211,30 @@ virar_a_direita(sul):-
 	agente_vivo(sim),
 	agente_orientacao(leste),
 	retract(agente_orientacao(leste)),
-	assert(agente_orientacao(sul)),
-	diminuir_pontuacao(1).
+	assert(agente_orientacao(sul)).
+
 
 virar_a_direita(oeste):-
 	agente_vivo(sim),
 	agente_orientacao(sul),
 	retract(agente_orientacao(sul)),
-	assert(agente_orientacao(oeste)),
-	diminuir_pontuacao(1).
+	assert(agente_orientacao(oeste)).
+
 
 virar_a_direta(norte):-
 	agente_vivo(sim),
 	agente_orientacao(oeste),
 	retract(agente_orientacao(oeste)),
-	assert(agente_orientacao(norte)),
-        diminuir_pontuacao(1).
+	assert(agente_orientacao(norte)).
+
 
 
 virar_a_direita(leste):-
 	agente_vivo(sim),
 	agente_orientacao(norte),
 	retract(agente_orientacao(norte)),
-	assert(agente_orientacao(leste)),
-	diminuir_pontuacao(1).
+	assert(agente_orientacao(leste)).
+
 
 
 pegar_objeto:-
