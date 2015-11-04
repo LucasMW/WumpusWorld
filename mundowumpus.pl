@@ -41,23 +41,23 @@ matar_agente:-
 move(
 estado(agenteLocal([X,Y]),norte,QtdOuro,QtdFlechas,Pontuacao),
 mover_para_frente(norte),
-estado(agenteLocal([X,Y+1]),Direcao,QtdOuro,QtdFlechas,Pontuacao)
-).
+estado(agenteLocal([X,Y1]),Direcao,QtdOuro,QtdFlechas,Pontuacao)
+) :- Y1 is Y+1.
 move(
 estado(agenteLocal([X,Y]),leste,QtdOuro,QtdFlechas,Pontuacao),
 mover_para_frente(leste),
-estado(agenteLocal([X+1,Y]),Direcao,QtdOuro,QtdFlechas,Pontuacao)
-).
+estado(agenteLocal([X1,Y]),Direcao,QtdOuro,QtdFlechas,Pontuacao)
+) :- X1 is X+1.
 move(
 estado(agenteLocal([X,Y]),sul,QtdOuro,QtdFlechas,Pontuacao),
 mover_para_frente(sul),
-estado(agenteLocal([X,Y-1]),Direcao,QtdOuro,QtdFlechas,Pontuacao)
-).
+estado(agenteLocal([X,Y1]),Direcao,QtdOuro,QtdFlechas,Pontuacao)
+) :- Y1 is Y-1.
 move(
 estado(agenteLocal([X,Y]),oeste,QtdOuro,QtdFlechas,Pontuacao),
 mover_para_frente(oeste),
-estado(agenteLocal([X-1,Y]),Direcao,QtdOuro,QtdFlechas,Pontuacao)
-).
+estado(agenteLocal([X1,Y]),Direcao,QtdOuro,QtdFlechas,Pontuacao)
+) :- X1 is X-1.
 move(
 estado(AgenteLocal,norte,QtdOuro,QtdFlechas,Pontuacao),
 virar_a_direita(leste),
