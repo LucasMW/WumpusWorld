@@ -14,7 +14,7 @@ public class Main
 		System.out.println("consult " + (q1.hasSolution() ? "succeeded" : "failed"));
 		Query q2 = new Query("iniciar_mundoteste");
 		q2.hasSolution();
-		Query q3 = new Query("tamanho_mundo(X)");
+		Query q3 = new Query("move(estado(agenteLocal([2,2]),_,_,_,_),Y,Z)");
 		q3.hasSolution();
 		Map<String, Term>[] solution = q3.allSolutions();
 		if (solution != null)
