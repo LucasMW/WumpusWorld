@@ -320,6 +320,10 @@ subir:-
 
 %propriedades do ambiente
 
+%printers 
+showAgent :-
+agente_local([X,Y]), write("["), write(X), write(","), write(Y) , write("]").
+
 
 %melhor ação
 
