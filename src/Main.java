@@ -18,6 +18,13 @@ public class Main
 		Query q3 = new Query("Z = iniciar_mundoteste");
 		showSolutions(q3,"Z");
 		
+		Query q4 = new Query("agente_local([X,Y])");
+		showSolutions(q4,"X");
+		showSolutions(q4,"Y");
+		Query q5 = new Query("tem_algo([3,1],Z)");
+		showSolutions(q5,"Z");
+		
+		
 		
 		Query bestAction = new Query("melhor_acao(X)");
 		bestAction.hasSolution();
@@ -29,11 +36,19 @@ public class Main
 				System.out.println("X = " + solution[i].get("X"));
 			}
 		}
+		
 
 	System.out.println(bestAction.isOpen());
 		
 		
 	}
+	private static void printMap()
+	{
+		//ask size of map
+		//consult every place of map assuming square matrix
+		
+	}
+	
 	private static void showSolutions(Query q, String whatToGet  )
 	{
 		q.hasSolution();
@@ -42,6 +57,7 @@ public class Main
 		{
 		for (int i = 0; i < solution.length; i++)
 		System.out.println(whatToGet + " = " + solution[i].get(whatToGet));
+		System.out.println(q.toString());
 		}
 	}
 }
