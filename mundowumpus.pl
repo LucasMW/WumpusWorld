@@ -323,7 +323,7 @@ subir:-
 %printers 
 showAgent :-
 agente_local([X,Y]), write("["), write(X), write(","), write(Y) , write("]").
-
+showState :- agente_local([X,Y]),Z = ponto(X,Y), contem(Z,A),write(Z),write(A).
 
 %melhor ação
 
