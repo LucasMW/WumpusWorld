@@ -185,8 +185,8 @@ tem_cheiro([X,Y],sim) :- adjacente([X,Y],[R,T]), wumpus([R,T]).
 tem_cheiro([X,Y],nao) :- adjacente([X,Y],[R,T]), not(wumpus([R,T])).
 tem_brisa([X,Y],sim) :- adjacente([X,Y], [R,T]), abismo([R,T]).
 tem_brisa([X,Y],nao) :- adjacente([X,Y], [R,T]), not(abismo([R,T])).
-tem_brilho([X,Y],sim) :- adjacente([X,Y], [R,T]), ouro([R,T]).
-tem_brilho([X,Y],nao) :- adjacente([X,Y], [R,T]), not(ouro([R,T])).
+tem_brilho([X,Y],sim) :-  ouro([X,Y]).
+tem_brilho([X,Y],nao) :-  not(ouro([X,Y])).
 tem_grito([X,Y],sim) :- adjacente([X,Y], [R,T]), morcego([R,T]).
 tem_grito([X,Y],nao) :- adjacente([X,Y], [R,T]), not(morcego([R,T])).
 tem_parede([X,Y],sim) :- adjacente([X,Y], [R,T]), parede([R,T]).
@@ -246,7 +246,7 @@ virar_a_direita(oeste):-
 	assert(agente_orientacao(oeste)).
 
 
-virar_a_direta(norte):-
+virar_a_direita(norte):-
 	agente_vivo(sim),
 	agente_orientacao(oeste),
 	retract(agente_orientacao(oeste)),
@@ -330,7 +330,7 @@ showState :- agente_local([X,Y]),Z = ponto(X,Y), contem(Z,A),write(Z),write(A).
 
 %melhor ação
 
-melhor_acao(pegar_objeto) :- pegar_objeto. 
-melhor_acao(mover_para_frente(A)) :- mover_para_frente(A).
-melhor_acao(virar_a_direita(A)) :- virar_a_direita(A). 
-melhor_acao(atirar_flecha) :- atirar_flecha .
+melhor_acao(pegar_objeto) :- pegar_objeto,!. 
+melhor_acao(mover_para_frente(Dir)) :- mover_para_frente(Dir).
+melhor_acao(virar_a_direita(A)) :- virar_a_direita(A),!. 
+melhor_acao(atirar_flecha) :- atirar_flecha,! .
