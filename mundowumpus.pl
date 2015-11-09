@@ -192,7 +192,7 @@ tem_grito([X,Y],nao) :- adjacente([X,Y], [R,T]), not(morcego([R,T])).
 tem_parede([X,Y],sim) :- adjacente([X,Y], [R,T]), parede([R,T]).
 tem_parede([X,Y],nao) :- adjacente([X,Y], [R,T]), not(parede([R,T])).
 
-tem_algo([X,Y],Z) :- (tem_cheiro([X,Y],sim), Z=cheiro); (tem_brisa([X,Y],sim),Z=brisa); (tem_brilho([X,Y],sim),Z=brilho); (tem_grito([X,Y],sim),Z=grito); (tem_parede([X,Y],sim),Z=parede).
+tem_algo([A,B],Z) :- ((tem_cheiro([X,Y],sim), Z=cheiro); (tem_brisa([X,Y],sim),Z=brisa); (tem_brilho([X,Y],sim),Z=brilho); (tem_grito([X,Y],sim),Z=grito); (tem_parede([X,Y],sim),Z=parede)), A is X, B is Y.
 %ações do agente
 
 mover_para_frente(leste):-
