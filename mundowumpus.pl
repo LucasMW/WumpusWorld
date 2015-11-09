@@ -20,12 +20,23 @@
 
 %fatos
 
-tamanho_mundo(T).
+tamanho_mundo(6).
 
 parede([]).
 
-fora_do_mundo([X,Y]):-
-	X < 1; X > 6; Y < 1; Y > 6.
+
+fora_do_mundo(ponto(X,Y)):-
+	(tamanho_mundo(Z), (X < 1; X > Z; Y < 1; Y > Z)).
+
+dentro_do_mundo(ponto(X,Y)) :- not(fora_do_mundo(ponto(X,Y))).
+
+
+	
+contem(ponto(X,Y),[]). % traverse map structure
+
+
+
+
 
 matar_wumpus:-
 	retract(wumpus_vivo(sim)),
@@ -312,4 +323,7 @@ subir:-
 
 %melhor ação
 
-
+melhor_acao(pegar_objeto) :- pegar_objeto. 
+melhor_acao(mover_para_frente(A)) :- mover_para_frente(A).
+melhor_acao(virar_a_direita(A)) :- virar_a_direita(A). 
+melhor_acao(atirar_flecha) :- atirar_flecha .
