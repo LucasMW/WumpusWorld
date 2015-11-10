@@ -16,8 +16,9 @@
       dentro_da_caverna/1,
       flechas/1,
       contagem_ouro/1,
-	  seguro/1,
-	  percorrido/1
+      seguro/1,
+     percorrido/1
+
   ]).
 
 %fatos
@@ -27,20 +28,22 @@ tamanho_mundo(6).
 parede([X,Y]):-fora_do_mundo([X,Y]).
 
 
-fora_do_mundo(ponto(X,Y)):-
+fora_do_mundo([X,Y]):-
 	(tamanho_mundo(Z), (X < 1; X > Z; Y < 1; Y > Z)).
 
-dentro_do_mundo(ponto(X,Y)) :- not(fora_do_mundo(ponto(X,Y))).
+dentro_do_mundo([X,Y]) :- not(fora_do_mundo([X,Y])).
 
 
-	
+
 seguro([X,Y]) :- percorrido([X,Y]).
 seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_brisa([A,B],nao), adjacente([X,Y],[A,B]) , tem_cheiro([A,B],nao).
 seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_cheiro([A,B],sim) , flechas(C), C > 1.
 seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_grito([A,B],nao).
+seguro([X,Y]) :- wumpus1_vivo(nao), wumpus2_vivo(nao), num_pocosvisitados(3).
 
 
-matar_wumpus:-
+
+matar_wumpus1:-
 	retract(wumpus_vivo(sim)),
 	assert(wumpus_vivo(nao)),
 	agente_local([X,Y]),
@@ -126,7 +129,7 @@ iniciar_agente :-
 
 	retractall(contagem_ouro(_)),
 	assert(contagem_ouro(0)),
-	
+
 	retractall(percorrido(_)),
 	assert(percorrido([1,1])).
 
@@ -155,9 +158,10 @@ iniciar_mundoteste :-
 	assert(abismo([4,2])),
 	assert(abismo([5,5])),
 
-	retractall(wumpus(_)),
-	assert(wumpus([3,5])),
-	assert(wumpus([4,1])),
+	retractall(wumpus1(_)),
+	retractall(wumpus2(_)),
+	assert(wumpus1([3,5])),
+	assert(wumpus2([4,1])),
 
 	retractall(morcego(_)),
 	assert(morcego([1,3])),
@@ -182,12 +186,11 @@ aumentar_pontuacao(P):-
 
 %percepção do agente
 
-adjacente( [X1,Y1], [X2,Y2] ):-  %
-	( X1 = X2 , Y2 is Y1+1
-	; X1 = X2 , Y2 is Y1-1
-	; Y1 = Y2 , X2 is X1-1
-	; Y1 = Y2 , X2 is X1+1
-	).
+adjacente( [X1,Y1], [X2,Y2] ):-	X1 = X2 , Y2 is Y1+1, dentro_do_mundo([X2,Y2]).
+adjacente( [X1,Y1], [X2,Y2] ):-	 X1 = X2 , Y2 is Y1-1, dentro_do_mundo([X2,Y2]).
+adjacente( [X1,Y1], [X2,Y2] ):- Y1 = Y2 , X2 is X1-1, dentro_do_mundo([X2,Y2]).
+adjacente( [X1,Y1], [X2,Y2] ):- Y1 = Y2 , X2 is X1+1, dentro_do_mundo([X2,Y2]).
+
 
 tem_cheiro([X,Y],sim) :- adjacente([X,Y],[R,T]), wumpus([R,T]).
 tem_cheiro([X,Y],nao) :- adjacente([X,Y],[R,T]), not(wumpus([R,T])).
@@ -199,7 +202,7 @@ tem_grito([X,Y],sim) :- adjacente([X,Y], [R,T]), morcego([R,T]).
 tem_grito([X,Y],nao) :- adjacente([X,Y], [R,T]), not(morcego([R,T])).
 tem_parede([X,Y],sim) :- adjacente([X,Y], [R,T]), parede([R,T]).
 tem_parede([X,Y],nao) :- adjacente([X,Y], [R,T]), not(parede([R,T])).
- 
+
 tem_algo([A,B],Z) :- ((tem_cheiro([X,Y],sim), Z=cheiro); (tem_brisa([X,Y],sim),Z=brisa); (tem_brilho([X,Y],sim),Z=brilho); (tem_grito([X,Y],sim),Z=grito); (tem_parede([X,Y],sim),Z=parede)), A is X, B is Y.
 
 testloop(0).
@@ -325,7 +328,7 @@ subir:-
 %util evalf(X,Ev) :- Ev is X. %force math evaluation
 
 
-%printers 
+%printers
 showAgent :-
 %agente_local([X,Y]), write("["), write(X), write(","), write(Y) , write("]").
 agente_local(P), agente_orientacao(O), pontuacao(Score), write("P = "), write(P), write(" \nO = ") ,write(O), write(" \nScore = "),write(Score).
@@ -339,13 +342,13 @@ showMap(N) :- N>0, write("Number : "), write(N), convertToMatrixIndex(N,[X,Y]), 
 
 %melhor ação
 
-%melhor_acao(fim) :-  
-melhor_acao(pegar_objeto) :- pegar_objeto,!. 
+%melhor_acao(fim) :-
+melhor_acao(pegar_objeto) :- pegar_objeto,!.
 melhor_acao(mover_para_frente(norte)) :- agente_local([X,Y]), Z is Y+1,seguro([X,Z]), mover_para_frente(norte),!.
 melhor_acao(mover_para_frente(leste)) :- agente_local([X,Y]), Z is X+1 ,seguro([Z,Y]), mover_para_frente(leste),!.
 melhor_acao(mover_para_frente(sul)) :- agente_local([X,Y]), Z is Y-1,seguro([X,Z]), mover_para_frente(sul),!.
 melhor_acao(mover_para_frente(oeste)) :- agente_local([X,Y]), Z is X-1 ,seguro([Z,Y]), mover_para_frente(oeste),!.
 melhor_acao(mover_para_frente(Dir)) :- agente_orientacao(Dir), mover_para_frente(Dir),!.
-melhor_acao(virar_a_direita(A)) :- virar_a_direita(A),!. 
+melhor_acao(virar_a_direita(A)) :- virar_a_direita(A),!.
 melhor_acao(atirar_flecha) :- atirar_flecha,! .
 
