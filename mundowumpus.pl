@@ -330,6 +330,12 @@ showAgent :-
 %agente_local([X,Y]), write("["), write(X), write(","), write(Y) , write("]").
 agente_local(P), agente_orientacao(O), pontuacao(Score), write("P = "), write(P), write(" \nO = ") ,write(O), write(" \nScore = "),write(Score).
 showState :- agente_local([X,Y]),Z = ponto(X,Y), contem(Z,A),write(Z),write(A).
+ 
+convertToMatrixIndex(N,[X,Y]) :- tamanho_mundo(T), X is mod(N,T)+1,Y is div(N,T)+1 .  
+
+showMap :- tamanho_mundo(T), V is T * T-1,showMap(V).
+showMap(0):- write([1,1]).
+showMap(N) :- N>0, write("Number : "), write(N), convertToMatrixIndex(N,[X,Y]), write([X,Y]),M is N-1, nl,showMap(M).
 
 %melhor ação
 
