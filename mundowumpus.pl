@@ -24,7 +24,7 @@
 
 tamanho_mundo(6).
 
-parede([]).
+parede([X,Y]):-fora_do_mundo([X,Y]).
 
 
 fora_do_mundo(ponto(X,Y)):-
@@ -42,7 +42,10 @@ seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_grito([A,B],nao).
 
 matar_wumpus:-
 	retract(wumpus_vivo(sim)),
-	assert(wumpus_vivo(nao)).
+	assert(wumpus_vivo(nao)),
+	agente_local([X,Y]),
+	adjacente([X,Y],[X1,Y1]),
+	assert(tem_cheiro([X1,Y1],nao)).
 
 matar_agente:-
 	retract(agente_vivo(sim)),
@@ -121,6 +124,7 @@ iniciar_agente :-
 	retractall(contagem_ouro(_)),
 	assert(contagem_ouro(0)),
 	
+	retractall(percorrido(_)),
 	assert(percorrido([1,1])).
 
 
@@ -173,9 +177,6 @@ aumentar_pontuacao(P):-
 	retract(pontuacao(X)).
 
 
-
-
-
 %percepção do agente
 
 adjacente( [X1,Y1], [X2,Y2] ):-  %
@@ -195,8 +196,11 @@ tem_grito([X,Y],sim) :- adjacente([X,Y], [R,T]), morcego([R,T]).
 tem_grito([X,Y],nao) :- adjacente([X,Y], [R,T]), not(morcego([R,T])).
 tem_parede([X,Y],sim) :- adjacente([X,Y], [R,T]), parede([R,T]).
 tem_parede([X,Y],nao) :- adjacente([X,Y], [R,T]), not(parede([R,T])).
-
+ 
 tem_algo([A,B],Z) :- ((tem_cheiro([X,Y],sim), Z=cheiro); (tem_brisa([X,Y],sim),Z=brisa); (tem_brilho([X,Y],sim),Z=brilho); (tem_grito([X,Y],sim),Z=grito); (tem_parede([X,Y],sim),Z=parede)), A is X, B is Y.
+
+testloop(0).
+testloop(N) :- N>0, write("Number : "), write(N), nl, M is N-1, testloop(M).
 %ações do agente
 
 mover_para_frente(leste):-
@@ -207,7 +211,9 @@ mover_para_frente(leste):-
 	assert(agente_local([X1,Y])),
 	retract(agente_local([X,Y])),
 	%retract(percorrido([X1,Y])),
-	assert(percorrido([X1,Y])),! .
+	assert(percorrido([X1,Y])),
+	diminuir_pontuacao(1),
+	! .
 
 mover_para_frente(oeste):-
 	agente_vivo(sim),
@@ -217,7 +223,9 @@ mover_para_frente(oeste):-
 	assert(agente_local([X1,Y])),
 	retract(agente_local([X,Y])),
 	%retract(percorrido([X1,Y])),
-	assert(percorrido([X1,Y])),! .
+	assert(percorrido([X1,Y])),
+	diminuir_pontuacao(1),
+	! .
 
 
 mover_para_frente(norte):-
@@ -228,7 +236,9 @@ mover_para_frente(norte):-
 	assert(agente_local([X,Y1])),
 	retract(agente_local([X,Y])),
 	%retract(percorrido([X,Y1])),
-	assert(percorrido([X,Y1])),! .
+	assert(percorrido([X,Y1])),
+	diminuir_pontuacao(1),
+	! .
 
 
 mover_para_frente(sul):-
@@ -239,29 +249,33 @@ mover_para_frente(sul):-
 	assert(agente_local([X,Y1])),
 	retract(agente_local([X,Y])),
 	%retract(percorrido([X,Y1])),
-	assert(percorrido([X,Y1])),! .
-
+	assert(percorrido([X,Y1])),
+	diminuir_pontuacao(1),
+	! .
 
 
 virar_a_direita(sul):-
 	agente_vivo(sim),
 	agente_orientacao(leste),
 	retract(agente_orientacao(leste)),
-	assert(agente_orientacao(sul)).
+	assert(agente_orientacao(sul)),
+	diminuir_pontuacao(1).
 
 
 virar_a_direita(oeste):-
 	agente_vivo(sim),
 	agente_orientacao(sul),
 	retract(agente_orientacao(sul)),
-	assert(agente_orientacao(oeste)).
+	assert(agente_orientacao(oeste)),
+	diminuir_pontuacao(1).
 
 
 virar_a_direita(norte):-
 	agente_vivo(sim),
 	agente_orientacao(oeste),
 	retract(agente_orientacao(oeste)),
-	assert(agente_orientacao(norte)).
+	assert(agente_orientacao(norte)),
+	diminuir_pontuacao(1).
 
 
 
@@ -269,7 +283,8 @@ virar_a_direita(leste):-
 	agente_vivo(sim),
 	agente_orientacao(norte),
 	retract(agente_orientacao(norte)),
-	assert(agente_orientacao(leste)).
+	assert(agente_orientacao(leste)),
+	diminuir_pontuacao(1).
 
 
 
@@ -283,31 +298,7 @@ pegar_objeto:-
 	Ouro1 is Ouro+1,
 	retract(contagem_ouro(Ouro)),
 	assert(contagem_ouro(Ouro1)),
-
-	diminuir_pontuacao(1).
-
-
-
-flecha_movimento([X,Y],leste):-
-	X1 is X+1, not(fora_do_mundo([X1,Y])),
-	assert(flecha_movimento([X1,Y],leste)).
-
-flecha_movimento([X,Y],oeste):-
-	X1 is X-1, not(fora_do_mundo([X1,Y])),
-	assert(flecha_movimento([X1,Y],oeste)).
-
-flecha_movimento([X,Y],norte):-
-	Y1 is Y+1, not(fora_do_mundo([X,Y1])),
-	assert(flecha_movimento([X,Y1],norte)).
-
-flecha_movimento([X,Y],sul):-
-	Y1 is Y-1, not(fora_do_mundo([X,Y1])),
-	assert(flecha_movimento([X,Y1],sul)).
-
-flecha_alvo([X,Y],Direcao):-
-	flecha_movimento([X,Y],Direcao),
-	wumpus([X,Y]),
-	matar_wumpus.
+	assert(tem_brilho([X,Y],nao)).
 
 
 atirar_flecha:-
@@ -317,9 +308,6 @@ atirar_flecha:-
 	X1 = X-1,
 	retract(flechas(X)),
 	assert(flechas(X1)),
-	agente_local([R,T]),
-	agente_orientacao(Direcao),
-	flecha_movimento([R,T],Direcao),
 	diminuir_pontuacao(10).
 
 
