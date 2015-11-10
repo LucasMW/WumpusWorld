@@ -36,10 +36,10 @@ dentro_do_mundo([X,Y]) :- not(fora_do_mundo([X,Y])).
 
 
 seguro([X,Y]) :- percorrido([X,Y]).
-seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_brisa([A,B],nao), adjacente([X,Y],[A,B]) , tem_cheiro([A,B],nao).
-seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_cheiro([A,B],sim) , flechas(C), C > 1.
-seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_grito([A,B],nao).
-seguro([X,Y]) :- wumpus_vivo(nao), wumpus_vivo(nao), num_pocosvisitados(3).
+seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_brisa([A,B],nao), tem_cheiro([A,B],nao) .
+seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_cheiro([A,B],sim) , flechas(C), C > 1 .
+seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_grito([A,B],nao) .
+%seguro([X,Y]) :- wumpus_vivo(nao), wumpus_vivo(nao), num_pocosvisitados(3).
 
 
 
@@ -48,15 +48,28 @@ matar_wumpus:-
 	assert(wumpus_vivo(nao)),
 	agente_local([X,Y]),
 	adjacente([X,Y],[X1,Y1]),
+	retract(wumpus([X,Y])),
 	assert(tem_cheiro([X1,Y1],nao)).
 
 matar_agente:-
 	retract(agente_vivo(sim)),
 	assert(agente_vivo(nao)),
-	diminuir_pontuacao(1000).
+	diminuir_pontuacao(1000),
+	nl,
+	write("MORREU!!!!!!").
 
 	%percepcao = [brisa,brilho,cheiro,grito,parede].
 	%estado(agenteLocal,direcao,qtdFlechas,pontuacao,qtdOuro).
+	
+teleportar_agente :-
+agente_local([X,Y]),
+tamanho_mundo(T),
+random_between(1,T, RX),
+random_between(1, T, RY),
+retract(morcego([X,Y])),
+retract(agente_local([X,Y])),
+assert(agente_local([RX,RY])).
+	
 move(
 estado(agenteLocal([X,Y]),norte,QtdOuro,QtdFlechas,Pontuacao),
 mover_para_frente(norte),
@@ -157,13 +170,14 @@ iniciar_mundoteste :-
 	assert(abismo([5,2])),
 	assert(abismo([4,2])),
 	assert(abismo([5,5])),
-
+		
 	retractall(wumpus(_)),
 	assert(wumpus([3,5])),
 	assert(wumpus([4,1])),
 
 	retractall(morcego(_)),
 	assert(morcego([1,3])),
+	assert(morcego([2,1])),
 	assert(morcego([3,3])).
 
 
@@ -206,6 +220,12 @@ tem_algo([A,B],Z) :- X is A, Y is B,((tem_cheiro([X,Y],sim), Z=cheiro); (tem_bri
 
 testloop(0).
 testloop(N) :- N>0, write("Number : "), write(N), nl, M is N-1, testloop(M).
+
+efeito([X,Y]) :- agente_local([X,Y]),  abismo([X,Y]), write("abismo"), matar_agente. 
+efeito([X,Y]) :- agente_local([X,Y]),  wumpus([X,Y]), write("wumpus te devorou") , flechas(F), F =< 0 , matar_agente. 
+efeito([X,Y]) :- agente_local([X,Y]),  wumpus([X,Y]), write("atirar_flecha é uma boa idéia") ,flechas(F), F > 0 , atirar_flecha , matar_wumpus. 
+efeito([X,Y]) :- agente_local([X,Y]),  morcego([X,Y]) , write("morcego te levou"),  teleportar_agente.    
+
 %ações do agente
 
 mover_para_frente(leste):-
@@ -218,6 +238,7 @@ mover_para_frente(leste):-
 	%retract(percorrido([X1,Y])),
 	assert(percorrido([X1,Y])),
 	diminuir_pontuacao(1),
+	efeito([X1,Y]),
 	! .
 
 mover_para_frente(oeste):-
@@ -230,6 +251,7 @@ mover_para_frente(oeste):-
 	%retract(percorrido([X1,Y])),
 	assert(percorrido([X1,Y])),
 	diminuir_pontuacao(1),
+	efeito([X1,Y]),
 	! .
 
 
@@ -243,6 +265,7 @@ mover_para_frente(norte):-
 	%retract(percorrido([X,Y1])),
 	assert(percorrido([X,Y1])),
 	diminuir_pontuacao(1),
+	efeito([X,Y1]),
 	! .
 
 
@@ -256,6 +279,7 @@ mover_para_frente(sul):-
 	%retract(percorrido([X,Y1])),
 	assert(percorrido([X,Y1])),
 	diminuir_pontuacao(1),
+	efeito([X,Y1]),
 	! .
 
 
@@ -324,6 +348,7 @@ subir:-
 %propriedades do ambiente
 
 %util evalf(X,Ev) :- Ev is X. %force math evaluation
+
 
 
 %printers
