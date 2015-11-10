@@ -68,7 +68,8 @@ random_between(1,T, RX),
 random_between(1, T, RY),
 retract(morcego([X,Y])),
 retract(agente_local([X,Y])),
-assert(agente_local([RX,RY])).
+assert(agente_local([RX,RY])),
+efeito([RX,RX]). %precisa consultar o efeito do local teleportado
 	
 move(
 estado(agenteLocal([X,Y]),norte,QtdOuro,QtdFlechas,Pontuacao),
