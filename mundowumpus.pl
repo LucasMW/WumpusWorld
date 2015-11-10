@@ -47,9 +47,10 @@ matar_wumpus:-
 	retract(wumpus_vivo(sim)),
 	assert(wumpus_vivo(nao)),
 	agente_local([X,Y]),
-	adjacente([X,Y],[X1,Y1]),
 	retract(wumpus([X,Y])),
-	assert(tem_cheiro([X1,Y1],nao)).
+	nl,
+	write("matou wumpus "),
+	write([X,Y]), nl.
 
 matar_agente:-
 	retract(agente_vivo(sim)),
