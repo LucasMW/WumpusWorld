@@ -178,11 +178,11 @@ aumentar_pontuacao(P):-
 
 %percepção do agente
 
-adjacente( [X1,Y1], [X2,Y2] ):-
-	( X1 = X2 , Y1 = Y2-1
-	; X1 = X2 , Y1 = Y2+1
-	; Y1 = Y2 , X1 = X2+1
-	; Y1 = Y2 , X1 = X2-1
+adjacente( [X1,Y1], [X2,Y2] ):-  %
+	( X1 = X2 , Y2 is Y1+1
+	; X1 = X2 , Y2 is Y1-1
+	; Y1 = Y2 , X2 is X1-1
+	; Y1 = Y2 , X2 is X1+1
 	).
 
 tem_cheiro([X,Y],sim) :- adjacente([X,Y],[R,T]), wumpus([R,T]).
