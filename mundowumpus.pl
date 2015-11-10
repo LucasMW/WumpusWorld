@@ -327,7 +327,8 @@ subir:-
 
 %printers 
 showAgent :-
-agente_local([X,Y]), write("["), write(X), write(","), write(Y) , write("]").
+%agente_local([X,Y]), write("["), write(X), write(","), write(Y) , write("]").
+agente_local(P), agente_orientacao(O), pontuacao(Score), write("P = "), write(P), write(" \nO = ") ,write(O), write(" \nScore = "),write(Score).
 showState :- agente_local([X,Y]),Z = ponto(X,Y), contem(Z,A),write(Z),write(A).
 
 %melhor ação
