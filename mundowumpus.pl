@@ -202,7 +202,7 @@ tem_grito([X,Y],nao) :- adjacente([X,Y], [R,T]), not(morcego([R,T])).
 tem_choque([X,Y],sim) :- adjacente([X,Y], [R,T]), parede([R,T]).
 tem_choque([X,Y],nao) :- adjacente([X,Y], [R,T]), not(parede([R,T])).
 
-tem_algo([A,B],Z) :- ((tem_cheiro([X,Y],sim), Z=cheiro); (tem_brisa([X,Y],sim),Z=brisa); (tem_brilho([X,Y],sim),Z=brilho); (tem_grito([X,Y],sim),Z=grito); (tem_choque([X,Y],sim),Z=parede)), A is X, B is Y.
+tem_algo([A,B],Z) :- X is A, Y is B,((tem_cheiro([X,Y],sim), Z=cheiro); (tem_brisa([X,Y],sim),Z=brisa); (tem_brilho([X,Y],sim),Z=brilho); (tem_grito([X,Y],sim),Z=grito); (tem_choque([X,Y],sim),Z=parede) ; Z = nada) .
 
 testloop(0).
 testloop(N) :- N>0, write("Number : "), write(N), nl, M is N-1, testloop(M).
@@ -335,8 +335,8 @@ showState :- agente_local([X,Y]),Z = ponto(X,Y), contem(Z,A),write(Z),write(A).
 convertToMatrixIndex(N,[X,Y]) :- tamanho_mundo(T), X is mod(N,T)+1,Y is div(N,T)+1 .  
 
 showMap :- tamanho_mundo(T), V is T * T-1,showMap(V).
-showMap(0):- write([1,1]).
-showMap(N) :- N>0, write("Number : "), write(N), convertToMatrixIndex(N,[X,Y]), write([X,Y]),M is N-1, nl,showMap(M).
+showMap(0):- write([1,1]),tem_algo([1,1],Z) ,write(Z) .
+showMap(N) :- N>0, write("Number : "), write(N), convertToMatrixIndex(N,[X,Y]), write([X,Y]), tem_algo([X,Y],Z) ,write(Z) ,M is N-1, nl,showMap(M).
 
 %melhor ação
 
