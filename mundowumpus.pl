@@ -39,11 +39,11 @@ seguro([X,Y]) :- percorrido([X,Y]).
 seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_brisa([A,B],nao), adjacente([X,Y],[A,B]) , tem_cheiro([A,B],nao).
 seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_cheiro([A,B],sim) , flechas(C), C > 1.
 seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_grito([A,B],nao).
-seguro([X,Y]) :- wumpus1_vivo(nao), wumpus2_vivo(nao), num_pocosvisitados(3).
+seguro([X,Y]) :- wumpus_vivo(nao), wumpus_vivo(nao), num_pocosvisitados(3).
 
 
 
-matar_wumpus1:-
+matar_wumpus:-
 	retract(wumpus_vivo(sim)),
 	assert(wumpus_vivo(nao)),
 	agente_local([X,Y]),
@@ -158,10 +158,9 @@ iniciar_mundoteste :-
 	assert(abismo([4,2])),
 	assert(abismo([5,5])),
 
-	retractall(wumpus1(_)),
-	retractall(wumpus2(_)),
-	assert(wumpus1([3,5])),
-	assert(wumpus2([4,1])),
+	retractall(wumpus(_)),
+	assert(wumpus([3,5])),
+	assert(wumpus([4,1])),
 
 	retractall(morcego(_)),
 	assert(morcego([1,3])),
@@ -200,10 +199,10 @@ tem_brilho([X,Y],sim) :-  ouro([X,Y]).
 tem_brilho([X,Y],nao) :-  not(ouro([X,Y])).
 tem_grito([X,Y],sim) :- adjacente([X,Y], [R,T]), morcego([R,T]).
 tem_grito([X,Y],nao) :- adjacente([X,Y], [R,T]), not(morcego([R,T])).
-tem_parede([X,Y],sim) :- adjacente([X,Y], [R,T]), parede([R,T]).
-tem_parede([X,Y],nao) :- adjacente([X,Y], [R,T]), not(parede([R,T])).
+tem_choque([X,Y],sim) :- adjacente([X,Y], [R,T]), parede([R,T]).
+tem_choque([X,Y],nao) :- adjacente([X,Y], [R,T]), not(parede([R,T])).
 
-tem_algo([A,B],Z) :- ((tem_cheiro([X,Y],sim), Z=cheiro); (tem_brisa([X,Y],sim),Z=brisa); (tem_brilho([X,Y],sim),Z=brilho); (tem_grito([X,Y],sim),Z=grito); (tem_parede([X,Y],sim),Z=parede)), A is X, B is Y.
+tem_algo([A,B],Z) :- ((tem_cheiro([X,Y],sim), Z=cheiro); (tem_brisa([X,Y],sim),Z=brisa); (tem_brilho([X,Y],sim),Z=brilho); (tem_grito([X,Y],sim),Z=grito); (tem_choque([X,Y],sim),Z=parede)), A is X, B is Y.
 
 testloop(0).
 testloop(N) :- N>0, write("Number : "), write(N), nl, M is N-1, testloop(M).
@@ -320,7 +319,6 @@ atirar_flecha:-
 subir:-
 	agente_vivo(sim),
 	agente_local([1,1]),
-	diminuir_pontuacao(1),
 	assert(dentro_da_caverna(nao)).
 
 %propriedades do ambiente
