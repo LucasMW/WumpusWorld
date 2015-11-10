@@ -98,6 +98,9 @@ consegue(estado(_,_,_,_,_,qtdOuro),[]).
 consegue(Estado1,[Movimento|Resto]) :- move(Estado1, Movimento, Estado2), consegue(Estado2,Resto).
 
 %inicializar
+start :-
+iniciar_agente,
+iniciar_mundoteste,!.
 
 iniciar_agente :-
 	retractall( dentro_da_caverna(_)),
