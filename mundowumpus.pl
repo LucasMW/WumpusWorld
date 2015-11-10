@@ -15,7 +15,9 @@
       pontuacao/1,
       dentro_da_caverna/1,
       flechas/1,
-      contagem_ouro/1
+      contagem_ouro/1,
+	  seguro/1,
+	  percorrido/1
   ]).
 
 %fatos
@@ -32,10 +34,11 @@ dentro_do_mundo(ponto(X,Y)) :- not(fora_do_mundo(ponto(X,Y))).
 
 
 	
-contem(ponto(X,Y),[]). % traverse map structure
-
-
-
+seguro([X,Y]) :- percorrido([X,Y]),!.
+seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_brisa([A,B],nao),!.
+seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_cheiro([A,B],nao),!.
+seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_cheiro([A,B],sim) , flechas(C), C > 1,!.
+seguro([X,Y]) :- adjacente([X,Y],[A,B]) , tem_grito([A,B],nao),!.
 
 
 matar_wumpus:-
@@ -117,7 +120,9 @@ iniciar_agente :-
 	assert(agente_vivo(sim)),
 
 	retractall(contagem_ouro(_)),
-	assert(contagem_ouro(0)).
+	assert(contagem_ouro(0)),
+	
+	assert(percorrido([1,1])).
 
 
 iniciar_mundoteste :-
@@ -201,8 +206,9 @@ mover_para_frente(leste):-
 	agente_local([X,Y]),
 	X1 is X+1, not(fora_do_mundo([X1,Y])),
 	assert(agente_local([X1,Y])),
-	retract(agente_local([X,Y])).
-
+	retract(agente_local([X,Y])),
+	retract(percorrido([X1,Y])),
+	assert(percorrido([X1,Y])) .
 
 mover_para_frente(oeste):-
 	agente_vivo(sim),
@@ -210,7 +216,9 @@ mover_para_frente(oeste):-
 	agente_local([X,Y]),
 	X1 is X-1, not(fora_do_mundo([X1,Y])),
 	assert(agente_local([X1,Y])),
-	retract(agente_local([X,Y])).
+	retract(agente_local([X,Y])),
+	retract(percorrido([X1,Y])),
+	assert(percorrido([X1,Y])) .
 
 
 mover_para_frente(norte):-
@@ -219,7 +227,9 @@ mover_para_frente(norte):-
 	agente_local([X,Y]),
 	Y1 is Y+1, not(fora_do_mundo([X,Y1])),
 	assert(agente_local([X,Y1])),
-	retract(agente_local([X,Y])).
+	retract(agente_local([X,Y])),
+	retract(percorrido([X,Y1])),
+	assert(percorrido([X,Y1])) .
 
 
 mover_para_frente(sul):-
@@ -228,7 +238,9 @@ mover_para_frente(sul):-
 	agente_local([X,Y]),
 	Y1 is Y-1, not(fora_do_mundo([X,Y1])),
 	assert(agente_local([X,Y1])),
-	retract(agente_local([X,Y])).
+	retract(agente_local([X,Y])),
+	retract(percorrido([X,Y1])),
+	assert(percorrido([X,Y1])) .
 
 
 
@@ -331,6 +343,9 @@ showState :- agente_local([X,Y]),Z = ponto(X,Y), contem(Z,A),write(Z),write(A).
 %melhor ação
 
 melhor_acao(pegar_objeto) :- pegar_objeto,!. 
-melhor_acao(mover_para_frente(Dir)) :- mover_para_frente(Dir).
+melhor_acao(mover_para_frente(norte)) :- agente_local([X,Y]), Z is Y+1,seguro([X,Z]), mover_para_frente(norte),!.
+melhor_acao(mover_para_frente(leste)) :- agente_local([X,Y]), Z is X+1 ,seguro([Z,Y]), mover_para_frente(leste),!.
+melhor_acao(mover_para_frente(sul)) :- agente_local([X,Y]), Z is Y-1,seguro([X,Z]), mover_para_frente(sul),!.
+melhor_acao(mover_para_frente(oeste)) :- agente_local([X,Y]), Z is X-1 ,seguro([Z,Y]), mover_para_frente(oeste),!.
 melhor_acao(virar_a_direita(A)) :- virar_a_direita(A),!. 
 melhor_acao(atirar_flecha) :- atirar_flecha,! .
