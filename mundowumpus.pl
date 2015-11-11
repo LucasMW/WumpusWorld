@@ -378,4 +378,4 @@ melhor_acao(virar_a_direita(A)) :- virar_a_direita(A),!.
 melhor_acao(atirar_flecha) :- atirar_flecha,! .
 
 
-run :- melhor_acao(X), (X=fim;run).
+run :- showAgent, nl,melhor_acao(X),write("done: ") ,write(X) , nl , (X=fim;run).
