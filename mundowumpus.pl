@@ -61,7 +61,7 @@ matar_agente:-
 
 	%percepcao = [brisa,brilho,cheiro,grito,parede].
 	%estado(agenteLocal,direcao,qtdFlechas,pontuacao,qtdOuro).
-	
+
 teleportar_agente :-
 agente_local([X,Y]),
 tamanho_mundo(T),
@@ -71,7 +71,7 @@ retract(morcego([X,Y])),
 retract(agente_local([X,Y])),
 assert(agente_local([RX,RY])),
 efeito([RX,RX]). %precisa consultar o efeito do local teleportado
-	
+
 move(
 estado(agenteLocal([X,Y]),norte,QtdOuro,QtdFlechas,Pontuacao),
 mover_para_frente(norte),
@@ -146,8 +146,9 @@ iniciar_agente :-
 	assert(contagem_ouro(0)),
 
 	retractall(percorrido(_)),
-	assert(percorrido([1,1])).
+	assert(percorrido([1,1])),
 
+	retractall(virada(_,_)).
 
 iniciar_mundoteste :-
 	%retractall(tamanho_mundo(_)),
@@ -172,7 +173,7 @@ iniciar_mundoteste :-
 	assert(abismo([5,2])),
 	assert(abismo([4,2])),
 	assert(abismo([5,5])),
-		
+
 	retractall(wumpus(_)),
 	assert(wumpus([3,5])),
 	assert(wumpus([4,1])),
@@ -223,10 +224,10 @@ tem_algo([A,B],Z) :- X is A, Y is B,((tem_cheiro([X,Y],sim), Z=cheiro); (tem_bri
 testloop(0).
 testloop(N) :- N>0, write("Number : "), write(N), nl, M is N-1, testloop(M).
 
-efeito([X,Y]) :- agente_local([X,Y]),  abismo([X,Y]), nl, write("abismo"), matar_agente. 
-efeito([X,Y]) :- agente_local([X,Y]),  wumpus([X,Y]), flechas(F), F =< 0 , nl, write("wumpus te devorou"), matar_agente. 
-efeito([X,Y]) :- agente_local([X,Y]),  wumpus([X,Y]),flechas(F), F > 0 , atirar_flecha ,  nl, write("atirar_flecha é uma boa idéia"),  matar_wumpus. 
-efeito([X,Y]) :- agente_local([X,Y]),  morcego([X,Y]) , nl, write("morcego te levou"),  teleportar_agente.    
+efeito([X,Y]) :- agente_local([X,Y]),  abismo([X,Y]), nl, write("abismo"), matar_agente.
+efeito([X,Y]) :- agente_local([X,Y]),  wumpus([X,Y]), flechas(F), F =< 0 , nl, write("wumpus te devorou"), matar_agente.
+efeito([X,Y]) :- agente_local([X,Y]),  wumpus([X,Y]),flechas(F), F > 0 , atirar_flecha ,  nl, write("atirar_flecha é uma boa idéia"),  matar_wumpus.
+efeito([X,Y]) :- agente_local([X,Y]),  morcego([X,Y]) , nl, write("morcego te levou"),  teleportar_agente.
 
 %ações do agente
 
@@ -358,24 +359,27 @@ showAgent :-
 %agente_local([X,Y]), write("["), write(X), write(","), write(Y) , write("]").
 agente_local(P), agente_orientacao(O), pontuacao(Score), write("P = "), write(P), write(" \nO = ") ,write(O), write(" \nScore = "),write(Score).
 showState :- agente_local([X,Y]),Z = ponto(X,Y), contem(Z,A),write(Z),write(A).
- 
-convertToMatrixIndex(N,[X,Y]) :- tamanho_mundo(T), X is mod(N,T)+1,Y is div(N,T)+1 .  
+
+convertToMatrixIndex(N,[X,Y]) :- tamanho_mundo(T), X is mod(N,T)+1,Y is div(N,T)+1 .
 
 showMap :- tamanho_mundo(T), V is T * T-1,showMap(V).
 showMap(0):- write([1,1]),tem_algo([1,1],Z) ,write(Z) .
 showMap(N) :- N>0, write("Number : "), write(N), convertToMatrixIndex(N,[X,Y]), write([X,Y]), tem_algo([X,Y],Z) ,write(Z) ,M is N-1, nl,showMap(M).
 
+
+incrementVirada([X,Y]) :-
+((virada([X,Y],C), retract(virada([X,Y],C)), CN is C+1) ; (CN = 1)) ,	assert(virada([X,Y],CN)).
+
 %melhor ação
 
 melhor_acao(fim) :-  (agente_vivo(nao), nl, write("lost")); (contagem_ouro(3), nl, write("won")),showAgent,!.
 melhor_acao(pegar_objeto) :- pegar_objeto,!.
-melhor_acao(mover_para_frente(norte)) :- agente_local([X,Y]), Z is Y+1,seguro([X,Z]), mover_para_frente(norte),!.
-melhor_acao(mover_para_frente(leste)) :- agente_local([X,Y]), Z is X+1 ,seguro([Z,Y]), mover_para_frente(leste),!.
-melhor_acao(mover_para_frente(sul)) :- agente_local([X,Y]), Z is Y-1,seguro([X,Z]), mover_para_frente(sul),!.
-melhor_acao(mover_para_frente(oeste)) :- agente_local([X,Y]), Z is X-1 ,seguro([Z,Y]), mover_para_frente(oeste),!.
-melhor_acao(mover_para_frente(Dir)) :- agente_orientacao(Dir), mover_para_frente(Dir),!.
-melhor_acao(virar_a_direita(A)) :- virar_a_direita(A),!.
+melhor_acao(mover_para_frente(norte)) :- agente_local([X,Y]), tem_brisa([X,Y],nao), mover_para_frente(norte),!.
+melhor_acao(mover_para_frente(leste)) :- agente_local([X,Y]),tem_brisa([X,Y],nao),  mover_para_frente(leste),!.
+melhor_acao(mover_para_frente(sul)) :- agente_local([X,Y]),tem_brisa([X,Y],nao), mover_para_frente(sul),!.
+melhor_acao(mover_para_frente(oeste)) :- agente_local([X,Y]), tem_brisa([X,Y],nao), mover_para_frente(oeste),!.
+melhor_acao(virar_a_direita(A)) :- agente_local([X,Y]), virada([X,Y],C), C =< 4 ,virar_a_direita(A), !.
 melhor_acao(atirar_flecha) :- atirar_flecha,! .
 
-
+run([X|Resto],N) :- M is N+1, write(M), showAgent, nl,melhor_acao(X),write("done: ") ,write(X) , nl , (X=fim;run(Resto,M)).
 run :- showAgent, nl,melhor_acao(X),write("done: ") ,write(X) , nl , (X=fim;run).
