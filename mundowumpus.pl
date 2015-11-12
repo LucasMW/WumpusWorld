@@ -70,7 +70,7 @@ random_between(1, T, RY),
 retract(morcego([X,Y])),
 retract(agente_local([X,Y])),
 assert(agente_local([RX,RY])),
-efeito([RX,RX]). %precisa consultar o efeito do local teleportado
+efeito([RX,RY]). %precisa consultar o efeito do local teleportado
 
 move(
 estado(agenteLocal([X,Y]),norte,QtdOuro,QtdFlechas,Pontuacao),
@@ -206,6 +206,8 @@ adjacente( [X1,Y1], [X2,Y2] ):-	X1 = X2 , Y2 is Y1+1, dentro_do_mundo([X2,Y2]).
 adjacente( [X1,Y1], [X2,Y2] ):-	 X1 = X2 , Y2 is Y1-1, dentro_do_mundo([X2,Y2]).
 adjacente( [X1,Y1], [X2,Y2] ):- Y1 = Y2 , X2 is X1-1, dentro_do_mundo([X2,Y2]).
 adjacente( [X1,Y1], [X2,Y2] ):- Y1 = Y2 , X2 is X1+1, dentro_do_mundo([X2,Y2]).
+
+%adjacente( [X1,Y], [X2,Y] ):-  X2 is X1+1, dentro_do_mundo([X2,Y]).
 
 
 tem_cheiro([X,Y],sim) :- adjacente([X,Y],[R,T]), wumpus([R,T]).
@@ -385,8 +387,11 @@ melhor_acao(fim) :-  (agente_vivo(nao), nl, write("lost")); (contagem_ouro(3), n
 melhor_acao(pegar_objeto) :- agente_local([X,Y]), tem_brilho([X,Y],sim), !.
 melhor_acao(mover_para_frente) :- agente_local([X,Y]), tem_brisa([X,Y],nao),!.
 melhor_acao(mover_para_frente) :- agente_local([X,Y]), tem_cheiro([X,Y],nao),!.
-melhor_acao(virar_a_direita(A)) :- agente_local([X,Y]), virada([X,Y],C), C =< 4 ,virar_a_direita(A), !.
+melhor_acao(virar_a_direita(norte)) :-  virar_a_direita(norte), !.
+melhor_acao(virar_a_direita(sul)) :-  virar_a_direita(sul), !.
+melhor_acao(virar_a_direita(leste)) :-  virar_a_direita(leste), !.
+melhor_acao(virar_a_direita(oeste)) :-  virar_a_direita(oeste), !.
 melhor_acao(atirar_flecha) :- atirar_flecha,! .
 
-run([X|Resto],N) :- M is N+1, write(M), showAgent, nl,melhor_acao(X),write("done: ") ,write(X) , nl , (X=fim;run(Resto,M)).
+run([X|Resto],N) :- M is N+1, write(M), showAgent, nl,melhor_acao(X), X, write("done: ") ,write(X) , nl , (X=fim;run(Resto,M)).
 run :- showAgent, nl,melhor_acao(X),X, write("done: ") ,write(X) , nl , showAgent, (X=fim;run).

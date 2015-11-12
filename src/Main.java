@@ -12,7 +12,8 @@ public class Main
 		System.out.println("Wumpus World");
 		Query q1 = new Query("consult", new Term[] {new Atom("C:\\Users\\Lucas\\workspace\\WumpusWorldInterface\\mundowumpus.pl")});
 		System.out.println("consult " + (q1.hasSolution() ? "succeeded" : "failed"));
-		Query q2 = new Query("Z = iniciar_agente");
+		Query q2 = new Query("start");
+		q2.hasSolution();
 		showSolutions(q2,"Z");
 		
 		Query q3 = new Query("Z = iniciar_mundoteste");
@@ -55,6 +56,7 @@ public class Main
 		Map<String, Term>[] solution = q.allSolutions();
 		if (solution != null)
 		{
+			System.out.println("sd");
 		for (int i = 0; i < solution.length; i++)
 		System.out.println(whatToGet + " = " + solution[i].get(whatToGet));
 		System.out.println(q.toString());
