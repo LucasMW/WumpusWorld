@@ -257,6 +257,9 @@ mover_para_frente(oeste):-
 	efeito([X1,Y]),
 	! .
 
+	
+	
+	
 
 mover_para_frente(norte):-
 	agente_vivo(sim),
@@ -330,8 +333,9 @@ pegar_objeto:-
 	Ouro1 is Ouro+1,
 	retract(contagem_ouro(Ouro)),
 	assert(contagem_ouro(Ouro1)),
-	assert(tem_brilho([X,Y],nao)).
-
+	%assert(tem_brilho([X,Y],nao)),
+	write(" pegou ouro"),
+	nl.
 
 atirar_flecha:-
 	agente_vivo(sim),
