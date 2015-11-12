@@ -374,16 +374,19 @@ showMap(N) :- N>0, write("Number : "), write(N), convertToMatrixIndex(N,[X,Y]), 
 incrementVirada([X,Y]) :-
 ((virada([X,Y],C), retract(virada([X,Y],C)), CN is C+1) ; (CN = 1)) ,	assert(virada([X,Y],CN)).
 
+mover_para_frente :-
+agente_orientacao(X),
+(mover_para_frente(X) ; true).
+
+
 %melhor ação
 
 melhor_acao(fim) :-  (agente_vivo(nao), nl, write("lost")); (contagem_ouro(3), nl, write("won")),showAgent,!.
-melhor_acao(pegar_objeto) :- pegar_objeto,!.
-melhor_acao(mover_para_frente(norte)) :- agente_local([X,Y]), tem_brisa([X,Y],nao), mover_para_frente(norte),!.
-melhor_acao(mover_para_frente(leste)) :- agente_local([X,Y]),tem_brisa([X,Y],nao),  mover_para_frente(leste),!.
-melhor_acao(mover_para_frente(sul)) :- agente_local([X,Y]),tem_brisa([X,Y],nao), mover_para_frente(sul),!.
-melhor_acao(mover_para_frente(oeste)) :- agente_local([X,Y]), tem_brisa([X,Y],nao), mover_para_frente(oeste),!.
+melhor_acao(pegar_objeto) :- agente_local([X,Y]), tem_brilho([X,Y],sim), !.
+melhor_acao(mover_para_frente) :- agente_local([X,Y]), tem_brisa([X,Y],nao),!.
+melhor_acao(mover_para_frente) :- agente_local([X,Y]), tem_cheiro([X,Y],nao),!.
 melhor_acao(virar_a_direita(A)) :- agente_local([X,Y]), virada([X,Y],C), C =< 4 ,virar_a_direita(A), !.
 melhor_acao(atirar_flecha) :- atirar_flecha,! .
 
 run([X|Resto],N) :- M is N+1, write(M), showAgent, nl,melhor_acao(X),write("done: ") ,write(X) , nl , (X=fim;run(Resto,M)).
-run :- showAgent, nl,melhor_acao(X),write("done: ") ,write(X) , nl , (X=fim;run).
+run :- showAgent, nl,melhor_acao(X),X, write("done: ") ,write(X) , nl , showAgent, (X=fim;run).
